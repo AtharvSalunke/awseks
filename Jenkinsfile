@@ -30,11 +30,13 @@ pipeline {
             steps {
 
                 bat '''
+                C:\\Terraform\\terraform.exe version
+
                 cd terraform
 
-                terraform init
+                C:\\Terraform\\terraform.exe init
 
-                terraform apply -auto-approve
+                C:\\Terraform\\terraform.exe apply -auto-approve
                 '''
             }
         }
