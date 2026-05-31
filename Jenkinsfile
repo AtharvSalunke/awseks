@@ -26,9 +26,8 @@ pipeline {
 
             steps {
 
-                sh '''
-                    docker build \
-                    -t ${ECR_REPOSITORY}:${IMAGE_TAG} .
+                bat '''
+                docker build -t %ECR_REPOSITORY%:%IMAGE_TAG% .
                 '''
             }
         }
@@ -37,13 +36,10 @@ pipeline {
 
             steps {
 
-                sh '''
-                    aws ecr get-login-password \
-                    --region ${AWS_REGION} | \
-                    docker login \
-                    --username AWS \
-                    --password-stdin \
-                    ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                bat '''
+                aws ecr get-login-password --region %AWS_REGION% > password.txt
+                type password.txt | docker login --username AWS --password-stdin %AWS_ACCOUNT_ID%.dkr.ecr.%AWS_REGION%.amazonaws.com
+                del password.txt
                 '''
             }
         }
@@ -52,10 +48,8 @@ pipeline {
 
             steps {
 
-                sh '''
-                    docker tag \
-                    ${ECR_REPOSITORY}:${IMAGE_TAG} \
-                    ${ECR_URI}:${IMAGE_TAG}
+                bat '''
+                docker tag %ECR_REPOSITORY%:%IMAGE_TAG% %ECR_URI%:%IMAGE_TAG%
                 '''
             }
         }
@@ -64,9 +58,8 @@ pipeline {
 
             steps {
 
-                sh '''
-                    docker push \
-                    ${ECR_URI}:${IMAGE_TAG}
+                bat '''
+                docker push %ECR_URI%:%IMAGE_TAG%
                 '''
             }
         }
@@ -89,8 +82,8 @@ pipeline {
 
         always {
 
-            sh '''
-                docker image prune -f || true
+            bat '''
+            docker image prune -f
             '''
         }
     }
