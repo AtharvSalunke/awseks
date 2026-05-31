@@ -6,11 +6,14 @@ pipeline {
 
         AWS_REGION = 'ap-south-1'
         AWS_ACCOUNT_ID = '456387077267'
+
         ECR_REPOSITORY = 'user-service'
 
         IMAGE_TAG = "${BUILD_NUMBER}"
 
         ECR_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}"
+
+        EKS_CLUSTER_NAME = 'demo-eks'
     }
 
     stages {
@@ -19,6 +22,20 @@ pipeline {
 
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Terraform Apply') {
+
+            steps {
+
+                bat '''
+                cd terraform
+
+                terraform init
+
+                terraform apply -auto-approve
+                '''
             }
         }
 
@@ -38,7 +55,9 @@ pipeline {
 
                 bat '''
                 aws ecr get-login-password --region %AWS_REGION% > password.txt
+
                 type password.txt | docker login --username AWS --password-stdin %AWS_ACCOUNT_ID%.dkr.ecr.%AWS_REGION%.amazonaws.com
+
                 del password.txt
                 '''
             }
@@ -64,20 +83,57 @@ pipeline {
             }
         }
 
+        stage('Configure EKS Access') {
+
+            steps {
+
+                bat '''
+                aws eks update-kubeconfig --region %AWS_REGION% --name %EKS_CLUSTER_NAME%
+                '''
+            }
+        }
+
+        stage('Deploy To EKS Using Helm') {
+
+            steps {
+
+                bat '''
+                helm upgrade --install user-service deployment\\helm ^
+                --set image.repository=%ECR_URI% ^
+                --set image.tag=%IMAGE_TAG%
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+
+            steps {
+
+                bat '''
+                kubectl get nodes
+
+                kubectl get pods
+
+                kubectl get svc
+
+                kubectl get ingress
+                '''
+            }
+        }
     }
 
     post {
 
         success {
 
-            echo "Image successfully pushed to ECR"
+            echo "Deployment Successful"
 
-            echo "${ECR_URI}:${IMAGE_TAG}"
+            echo "Image: ${ECR_URI}:${IMAGE_TAG}"
         }
 
         failure {
 
-            echo "Pipeline failed"
+            echo "Pipeline Failed"
         }
 
         always {
