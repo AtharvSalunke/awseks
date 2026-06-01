@@ -100,7 +100,7 @@ pipeline {
             steps {
 
                 bat '''
-                helm upgrade --install user-service deployment\\helm ^
+                C:\\Helm\\windows-amd64\\helm.exe upgrade --install user-service deployment\\helm ^
                 --set image.repository=%ECR_URI% ^
                 --set image.tag=%IMAGE_TAG%
                 '''
