@@ -1,3 +1,18 @@
+data "aws_vpc" "default" {
+
+  default = true
+}
+
+data "aws_subnets" "default" {
+
+  filter {
+
+    name = "vpc-id"
+
+    values = [data.aws_vpc.default.id]
+  }
+}
+
 module "eks" {
 
   source = "terraform-aws-modules/eks/aws"
@@ -6,6 +21,9 @@ module "eks" {
 
   cluster_name    = "demo-eks"
   cluster_version = "1.33"
+
+  vpc_id     = data.aws_vpc.default.id
+  subnet_ids = data.aws_subnets.default.ids
 
   enable_cluster_creator_admin_permissions = true
 
