@@ -14,7 +14,7 @@ app.get("/health", (req, res) => {
 // Main endpoint
 app.get("/", (req, res) => {
     res.status(200).json({
-        message: "Hello from EKS Microservice"
+        message: "Hello from EKS "
     });
 });
 
