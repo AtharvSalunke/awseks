@@ -95,11 +95,25 @@ pipeline {
             }
         }
 
+        stage('Test Kubernetes Access') {
+
+            steps {
+
+                bat '''
+                set KUBECONFIG=C:\\Users\\athar\\.kube\\config
+
+                kubectl get nodes
+                '''
+            }
+        }
+
         stage('Deploy To EKS Using Helm') {
 
             steps {
 
                 bat '''
+                set KUBECONFIG=C:\\Users\\athar\\.kube\\config
+
                 C:\\Helm\\windows-amd64\\helm.exe upgrade --install user-service deployment\\helm ^
                 --set image.repository=%ECR_URI% ^
                 --set image.tag=%IMAGE_TAG%
@@ -112,6 +126,8 @@ pipeline {
             steps {
 
                 bat '''
+                set KUBECONFIG=C:\\Users\\athar\\.kube\\config
+
                 kubectl get nodes
 
                 kubectl get pods
