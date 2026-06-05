@@ -10,7 +10,8 @@ spec:
     app: user-service
 
   ports:
-  - port: {{ .Values.service.port }}
+  - name: http
+    port: {{ .Values.service.port }}
     targetPort: {{ .Values.service.targetPort }}
 
   type: {{ .Values.service.type }}
