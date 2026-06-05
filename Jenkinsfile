@@ -14,6 +14,8 @@ pipeline {
         ECR_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}"
 
         EKS_CLUSTER_NAME = 'demo-eks'
+
+        GRAFANA_PASSWORD = credentials('grafana-admin-password')
     }
 
     stages {
