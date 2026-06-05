@@ -121,6 +121,22 @@ pipeline {
             }
         }
 
+        stage('Deploy ServiceMonitor') {
+
+             steps {
+
+                bat '''
+                set KUBECONFIG=C:\\Users\\athar\\.kube\\config
+
+                if exist monitoring\\servicemonitor.yaml (
+                    kubectl apply -f monitoring\\servicemonitor.yaml
+                ) else (
+                    echo ServiceMonitor file not found. Skipping...
+                )
+                '''
+            }
+    }
+
         stage('Verify Deployment') {
 
             steps {
