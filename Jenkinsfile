@@ -43,6 +43,27 @@ pipeline {
             }
         }
 
+
+        stage('Create ECR Repository If Not Exists') {
+
+            steps {
+
+                bat '''
+                aws ecr describe-repositories --repository-names %ECR_REPOSITORY% --region %AWS_REGION%
+
+                if errorlevel 1 (
+                    echo Creating ECR Repository...
+
+                    aws ecr create-repository ^
+                    --repository-name %ECR_REPOSITORY% ^
+                    --region %AWS_REGION%
+                ) else (
+                    echo ECR Repository Already Exists
+                )
+                '''
+            }
+}
+
         stage('Build Docker Image') {
 
             steps {
