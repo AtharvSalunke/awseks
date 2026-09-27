@@ -33,7 +33,7 @@ output "eks_cluster_version" {
   value       = module.eks.cluster_version
 }
 
-output "eks_node_group_name" {
-  description = "EKS managed node group name"
-  value       = module.eks.eks_managed_node_groups["default"].name
-}
+# output "eks_node_group_name" {
+#   description = "EKS managed node group name"
+#   value       = module.eks.eks_managed_node_groups["default"].name
+# }
